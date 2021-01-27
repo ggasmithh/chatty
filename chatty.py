@@ -34,9 +34,7 @@ def train(message: str) -> None:
         text_model = markovify.combine([text_model, new_text], [1, 1.025])
     else:
         text_model = new_text
-        
-
- 
+    
 def train_and_reply(update: Update, context: CallbackContext) -> None:
     if str(update.message.chat_id) == str(CHATTY_CHAT_ID):
         context.bot.send_chat_action(chat_id = update.effective_message.chat_id, action = ChatAction.TYPING)
@@ -47,7 +45,10 @@ def train_and_reply(update: Update, context: CallbackContext) -> None:
             full_message += f"{text_model.make_sentence()} "
 
         update.message.reply_text(full_message)
-
+    
+def start(update: Update, context: CallbackContext) -> None:
+    if str(update.message.chat_id) == str(CHATTY_CHAT_ID):
+        update.message.reply_text("Hello")
 
 if __name__ == "__main__":
     try:
@@ -60,6 +61,9 @@ if __name__ == "__main__":
     updater = Updater(CHATTY_BOT_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(MessageHandler(Filters.text & (~Filters.command), train_and_reply))
+    dispatcher.add_handler(CommandHandler('start', start))
+
+
 
     updater.start_polling()
     updater.idle()

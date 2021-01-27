@@ -41,7 +41,7 @@ def train_and_reply(update: Update, context: CallbackContext) -> None:
         train(update.message.text)
 
         # TODO: make this conditional less sloppy
-        if randrange(0, 100) < 20:
+        if randrange(0, 100) < 10:
             context.bot.send_chat_action(chat_id = update.effective_message.chat_id, action = ChatAction.TYPING)
             full_message = ""
             for i in range(randrange(1, 10)):

@@ -37,7 +37,7 @@ def train(message: str) -> None:
         
 
  
-def reply(update: Update, context: CallbackContext) -> None:
+def train_and_reply(update: Update, context: CallbackContext) -> None:
     if str(update.message.chat_id) == str(CHATTY_CHAT_ID):
         context.bot.send_chat_action(chat_id = update.effective_message.chat_id, action = ChatAction.TYPING)
         train(context.message.text)
@@ -59,7 +59,7 @@ if __name__ == "__main__":
 
     updater = Updater(CHATTY_BOT_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
-    dispatcher.add_handler(MessageHandler(Filters.text, reply))
+    dispatcher.add_handler(MessageHandler(Filters.text, train_and_reply))
 
     updater.start_polling()
     updater.idle()

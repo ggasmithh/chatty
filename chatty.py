@@ -38,14 +38,16 @@ def train(message: str) -> None:
     
 def train_and_reply(update: Update, context: CallbackContext) -> None:
     if str(update.message.chat_id) == str(CHATTY_CHAT_ID):
-        context.bot.send_chat_action(chat_id = update.effective_message.chat_id, action = ChatAction.TYPING)
         train(update.message.text)
 
-        full_message = ""
-        for i in range(randrange(1, 10)):
-            full_message += f"{text_model.make_sentence(tries=100)} "
+        # TODO: make this conditional less sloppy
+        if randrange(0, 100) < 20:
+            context.bot.send_chat_action(chat_id = update.effective_message.chat_id, action = ChatAction.TYPING)
+            full_message = ""
+            for i in range(randrange(1, 10)):
+                full_message += f"{text_model.make_sentence(tries=100)} "
 
-        update.message.reply_text(full_message)
+            update.message.reply_text(full_message)
     
 def start(update: Update, context: CallbackContext) -> None:
     if str(update.message.chat_id) == str(CHATTY_CHAT_ID):

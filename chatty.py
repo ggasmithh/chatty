@@ -39,7 +39,7 @@ def train(message: str) -> None:
  
 def reply(update: Update, context: CallbackContext) -> None:
     if str(update.message.chat_id) == str(CHATTY_CHAT_ID):
-        context.bot.send_chat_action(chat_id = update.effective_message.chat, action = ChatAction.TYPING)
+        context.bot.send_chat_action(chat_id = update.effective_message.chat_id, action = ChatAction.TYPING)
         train(context.message.text)
 
         full_message = ""

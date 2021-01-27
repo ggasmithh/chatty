@@ -22,7 +22,7 @@ def load_model() -> markovify.Text:
     with open(MODEL_NAME, "r") as f:
         return markovify.Text.from_json(f.read())
 
-def train(message: String) -> None:
+def train(message: str) -> None:
     schedule.run_pending()
 
     new_text = markovify.Text(message)

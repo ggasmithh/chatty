@@ -27,7 +27,7 @@ def load_model() -> markovify.Text:
 def train(message: str) -> None:
     schedule.run_pending()
 
-    new_text = markovify.Text(f"{message}{'.' if not (message.endswith('.') or message.endswith('!') or message.endswith('?')) else ''}", well_formed = False)
+    new_text = markovify.Text(f"{message}{'.' if not (message.endswith('.') or message.endswith('!') or message.endswith('?')) else ''}", well_formed = False, state_size = 4)
 
     global text_model
 

@@ -1,6 +1,4 @@
 from telegram import ChatAction, Update
-from telegram
-from telegram import ChatAction, Update
 from telegram.ext import MessageHandler, Filters, Updater, CallbackContext
 import logging
 import markovify

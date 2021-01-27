@@ -27,10 +27,12 @@ def train(message: String) -> None:
 
     new_text = markovify.Text(message)
 
+    global text_model
+
     if not text_model:
-        global text_model = new_text
+        text_model = new_text
     else:
-        global text_model = markovify.combine([text_model, new_text], [1, 1.025])
+        text_model = markovify.combine([text_model, new_text], [1, 1.025])
 
  
 def reply(update: Update, context: CallbackContext) -> None:

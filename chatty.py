@@ -5,6 +5,10 @@ from telegram.ext import CommandHandler, Updater, CallbackContext
 import logging
 import markovify
 import schedule
+from os import environ
+
+CHATTY_BOT_TOKEN = environ['CHATTY_BOT_TOKEN']
+CHATTY_CHAT_ID = environ['CHATTY_CHAT_ID']
 
 MODEL_NAME = "model.json"
 

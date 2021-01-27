@@ -15,8 +15,9 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                      level=logging.INFO)
 
 def save_model() -> None:
-    with open(MODEL_NAME, "w") as f:
-        f.write(markovify.Text(text_model).to_json())
+    if text_model:
+        with open(MODEL_NAME, "w") as f:
+            f.write(markovify.Text(text_model).to_json())
 
 def load_model() -> markovify.Text:
     with open(MODEL_NAME, "r") as f:
@@ -29,10 +30,11 @@ def train(message: str) -> None:
 
     global text_model
 
-    if not text_model:
-        text_model = new_text
-    else:
+    if text_model:
         text_model = markovify.combine([text_model, new_text], [1, 1.025])
+    else:
+        text_model = new_text
+        
 
  
 def reply(update: Update, context: CallbackContext) -> None:
@@ -53,11 +55,11 @@ if __name__ == "__main__":
     except:
         text_model = None
     
-    schedule.every(10).minutes.do(save_model(text_model))
+    schedule.every(10).minutes.do(save_model)
 
     updater = Updater(CHATTY_BOT_TOKEN, use_context=True)
-    dispacher = updater.dispatcher
-    dispatcher.add_handler(MessageHandler(Filters.text), reply)
+    dispatcher = updater.dispatcher
+    dispatcher.add_handler(MessageHandler(Filters.text, reply))
 
     updater.start_polling()
     updater.idle()

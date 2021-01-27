@@ -18,7 +18,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 def save_model() -> None:
     if text_model:
         with open(MODEL_NAME, "w") as f:
-            f.write(markovify.Text(text_model).to_json())
+            f.write(text_model.to_json())
 
 def load_model() -> markovify.Text:
     with open(MODEL_NAME, "r") as f:
@@ -42,7 +42,7 @@ def train_and_reply(update: Update, context: CallbackContext) -> None:
         train(update.message.text)
 
         full_message = ""
-        for i in range(randrange(1, 5)):
+        for i in range(randrange(1, 10)):
             full_message += f"{text_model.make_sentence(tries=100)} "
 
         update.message.reply_text(full_message)
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     except:
         text_model = None
     
-    schedule.every(10).minutes.do(save_model)
+    schedule.every(5).minutes.do(save_model)
 
     atexit.register(save_model)
 

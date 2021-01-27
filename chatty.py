@@ -1,5 +1,5 @@
 from telegram import ChatAction, Update
-from telegram.ext import MessageHandler, Filters, Updater, CallbackContext
+from telegram.ext import CommandHandler, MessageHandler, Filters, Updater, CallbackContext
 import logging
 import markovify
 import schedule
@@ -40,7 +40,7 @@ def train(message: str) -> None:
 def train_and_reply(update: Update, context: CallbackContext) -> None:
     if str(update.message.chat_id) == str(CHATTY_CHAT_ID):
         context.bot.send_chat_action(chat_id = update.effective_message.chat_id, action = ChatAction.TYPING)
-        train(context.message.text)
+        train(update.message.text)
 
         full_message = ""
         for i in randrange(5):
@@ -59,7 +59,7 @@ if __name__ == "__main__":
 
     updater = Updater(CHATTY_BOT_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
-    dispatcher.add_handler(MessageHandler(Filters.text, train_and_reply))
+    dispatcher.add_handler(MessageHandler(Filters.text & (~Filters.command), train_and_reply))
 
     updater.start_polling()
     updater.idle()

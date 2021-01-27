@@ -5,6 +5,7 @@ import markovify
 import schedule
 from os import environ
 from random import randrange
+import atexit
 
 CHATTY_BOT_TOKEN = environ['CHATTY_BOT_TOKEN']
 CHATTY_CHAT_ID = environ['CHATTY_CHAT_ID']
@@ -26,7 +27,7 @@ def load_model() -> markovify.Text:
 def train(message: str) -> None:
     schedule.run_pending()
 
-    new_text = markovify.Text(message)
+    new_text = markovify.Text(f"{message}{'.' if not (message.endswith('.') or message.endswith('!') or message.endswith('?')) else ''}", well_formed = False)
 
     global text_model
 
@@ -42,13 +43,15 @@ def train_and_reply(update: Update, context: CallbackContext) -> None:
 
         full_message = ""
         for i in range(randrange(1, 5)):
-            full_message += f"{text_model.make_sentence()} "
+            full_message += f"{text_model.make_sentence(tries=100)} "
 
         update.message.reply_text(full_message)
     
 def start(update: Update, context: CallbackContext) -> None:
     if str(update.message.chat_id) == str(CHATTY_CHAT_ID):
         update.message.reply_text("Hello")
+
+
 
 if __name__ == "__main__":
     try:
@@ -58,6 +61,8 @@ if __name__ == "__main__":
     
     schedule.every(10).minutes.do(save_model)
 
+    atexit.register(save_model)
+
     updater = Updater(CHATTY_BOT_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
     train_and_reply_handler = MessageHandler(Filters.text & (~Filters.command), train_and_reply)
@@ -66,4 +71,6 @@ if __name__ == "__main__":
     dispatcher.add_handler(start_handler)
 
     updater.start_polling()
-    #updater.idle()
+    updater.idle()
+
+

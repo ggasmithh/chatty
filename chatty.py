@@ -41,7 +41,7 @@ def train_and_reply(update: Update, context: CallbackContext) -> None:
         train(update.message.text)
 
         full_message = ""
-        for i in randrange(5):
+        for i in range(randrange(1, 5)):
             full_message += f"{text_model.make_sentence()} "
 
         update.message.reply_text(full_message)
@@ -60,10 +60,10 @@ if __name__ == "__main__":
 
     updater = Updater(CHATTY_BOT_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
-    dispatcher.add_handler(MessageHandler(Filters.text & (~Filters.command), train_and_reply))
-    dispatcher.add_handler(CommandHandler('start', start))
-
-
+    train_and_reply_handler = MessageHandler(Filters.text & (~Filters.command), train_and_reply)
+    dispatcher.add_handler(train_and_reply_handler)
+    start_handler = CommandHandler('start', start)
+    dispatcher.add_handler(start_handler)
 
     updater.start_polling()
-    updater.idle()
+    #updater.idle()

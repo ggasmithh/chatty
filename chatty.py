@@ -32,7 +32,7 @@ def train(message: str) -> None:
     global text_model
 
     if text_model:
-        text_model = markovify.combine([text_model, new_text], [1, 1.1])
+        text_model = markovify.combine([text_model, new_text], [1, 1.5])
     else:
         text_model = new_text
     

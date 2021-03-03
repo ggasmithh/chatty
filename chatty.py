@@ -27,12 +27,12 @@ def load_model() -> markovify.Text:
 def train(message: str) -> None:
     schedule.run_pending()
 
-    new_text = markovify.Text(f"{message}{'.' if not (message.endswith('.') or message.endswith('!') or message.endswith('?')) else ''}", well_formed = False)
+    new_text = markovify.Text(f"{message}{'.' if not (message.endswith('.') or message.endswith('!') or message.endswith('?')) else ''}", well_formed = False, state_size=4)
 
     global text_model
 
     if text_model:
-        text_model = markovify.combine([text_model, new_text], [1, 1.1])
+        text_model = markovify.combine([text_model, new_text], [1, 1.5])
     else:
         text_model = new_text
     
@@ -41,11 +41,13 @@ def train_and_reply(update: Update, context: CallbackContext) -> None:
         train(update.message.text)
 
         # TODO: make this conditional less sloppy
-        if randrange(0, 100) < 20:
+        if randrange(0, 100) < 5:
             context.bot.send_chat_action(chat_id = update.effective_message.chat_id, action = ChatAction.TYPING)
             full_message = ""
-            for i in range(randrange(1, 10)):
-                full_message += f"{text_model.make_sentence(tries=100)} "
+            for i in range(randrange(1, 5)):
+            	new_sentence = text_model.make_sentence(tries=100)
+                if new_sentence != "None":
+                    full_message += f"{new_sentence} "
 
             update.message.reply_text(full_message)
     

@@ -24,6 +24,15 @@ def load_model() -> markovify.Text:
     with open(MODEL_NAME, "r") as f:
         return markovify.Text.from_json(f.read())
 
+def setup_schedule() -> None:
+    schedule.every(5).minutes.do(save_model)
+
+def run_func_sched_safe(func) -> None:
+    schedule.run_all()
+    schedule.clear()
+    func()
+    setup_schedule()
+
 def train(message: str) -> None:
     schedule.run_pending()
 
@@ -56,16 +65,13 @@ def start(update: Update, context: CallbackContext) -> None:
     if str(update.message.chat_id) == str(CHATTY_CHAT_ID):
         update.message.reply_text("Hello")
 
-
-
 if __name__ == "__main__":
     try:
         text_model = load_model()
     except:
         text_model = None
     
-    schedule.every(5).minutes.do(save_model)
-
+    setup_schedule()
     atexit.register(save_model)
 
     updater = Updater(CHATTY_BOT_TOKEN, use_context=True)

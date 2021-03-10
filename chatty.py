@@ -32,7 +32,7 @@ def setup_schedule() -> None:
 def generate_get_size_message() -> str:
     schedule.run_all()
     schedule.clear()
-    output = f"The current size of the model is {path.getsize(MODEL_NAME)}"
+    output = f"The current size of the model is {path.getsize(MODEL_NAME)} bytes!"
     setup_schedule()
     return output
 

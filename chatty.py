@@ -3,7 +3,7 @@ from telegram.ext import CommandHandler, MessageHandler, Filters, Updater, Callb
 import logging
 import markovify
 import schedule
-from os import environ
+from os import environ, path
 from random import randrange
 import atexit
 
@@ -14,6 +14,8 @@ MODEL_NAME = "text_model.json"
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                      level=logging.INFO)
+
+## HELPER FUNCTIONS ##
 
 def save_model() -> None:
     if text_model:
@@ -33,6 +35,12 @@ def run_func_sched_safe(func) -> None:
     func()
     setup_schedule()
 
+def generate_get_size_message() -> str:
+    return f"The current size of the model is {os.path.getsize(MODEL_NAME)}"
+
+def check_chat(update: Update) -> bool:
+    return str(update.message.chat_id) == str(CHATTY_CHAT_ID)
+
 def train(message: str) -> None:
     schedule.run_pending()
 
@@ -44,12 +52,17 @@ def train(message: str) -> None:
         text_model = markovify.combine([text_model, new_text], [1, 1.5])
     else:
         text_model = new_text
-    
+
+## FUNCTIONS CALLED BY DISPATCHER ##
+
+def start(update: Update, context: CallbackContext) -> None:
+    if check_chat():
+        update.message.reply_text("Hello")
+
 def train_and_reply(update: Update, context: CallbackContext) -> None:
-    if str(update.message.chat_id) == str(CHATTY_CHAT_ID):
+    if check_chat():
         train(update.message.text)
 
-        # TODO: make this conditional less sloppy
         if randrange(0, 100) < 5:
             context.bot.send_chat_action(chat_id = update.effective_message.chat_id, action = ChatAction.TYPING)
             full_message = ""
@@ -60,10 +73,11 @@ def train_and_reply(update: Update, context: CallbackContext) -> None:
                     full_message += f"{new_sentence} "
 
             update.message.reply_text(full_message)
-    
-def start(update: Update, context: CallbackContext) -> None:
-    if str(update.message.chat_id) == str(CHATTY_CHAT_ID):
-        update.message.reply_text("Hello")
+
+def get_size(update: Update, context: CallbackContext) -> None:
+    if check_chat():
+        context.bot.send_chat_action(chat_id = update.effective_message.chat_id, action = ChatAction.TYPING)
+        update.message.reply_text(run_func_sched_safe(generate_get_size_message()))
 
 if __name__ == "__main__":
     try:
@@ -76,10 +90,16 @@ if __name__ == "__main__":
 
     updater = Updater(CHATTY_BOT_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
-    train_and_reply_handler = MessageHandler(Filters.text & (~Filters.command), train_and_reply)
-    dispatcher.add_handler(train_and_reply_handler)
+
     start_handler = CommandHandler('start', start)
     dispatcher.add_handler(start_handler)
+
+    train_and_reply_handler = MessageHandler(Filters.text & (~Filters.command), train_and_reply)
+    dispatcher.add_handler(train_and_reply_handler)
+
+    get_size_handler = CommandHandler('get_size', get_size)
+    dispatcher.add_handler(get_size_handler)
+    
 
     updater.start_polling()
     updater.idle()

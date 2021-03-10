@@ -36,7 +36,7 @@ def run_func_sched_safe(func) -> None:
     setup_schedule()
 
 def generate_get_size_message() -> str:
-    return f"The current size of the model is {os.path.getsize(MODEL_NAME)}"
+    return f"The current size of the model is {path.getsize(MODEL_NAME)}"
 
 def check_chat(update: Update) -> bool:
     return str(update.message.chat_id) == str(CHATTY_CHAT_ID)

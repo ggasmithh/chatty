@@ -46,8 +46,8 @@ def train_and_reply(update: Update, context: CallbackContext) -> None:
             full_message = ""
                               
             for i in range(randrange(1, 5)):
-            	new_sentence = text_model.make_sentence(tries=100)
-                if new_sentence != "None":
+                new_sentence = text_model.make_sentence(tries=100)
+                if new_sentence:
                     full_message += f"{new_sentence} "
 
             update.message.reply_text(full_message)

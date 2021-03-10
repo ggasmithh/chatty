@@ -56,11 +56,11 @@ def train(message: str) -> None:
 ## FUNCTIONS CALLED BY DISPATCHER ##
 
 def start(update: Update, context: CallbackContext) -> None:
-    if check_chat():
+    if check_chat(update):
         update.message.reply_text("Hello")
 
 def train_and_reply(update: Update, context: CallbackContext) -> None:
-    if check_chat():
+    if check_chat(update):
         train(update.message.text)
 
         if randrange(0, 100) < 5:
@@ -75,7 +75,7 @@ def train_and_reply(update: Update, context: CallbackContext) -> None:
             update.message.reply_text(full_message)
 
 def get_size(update: Update, context: CallbackContext) -> None:
-    if check_chat():
+    if check_chat(update):
         context.bot.send_chat_action(chat_id = update.effective_message.chat_id, action = ChatAction.TYPING)
         update.message.reply_text(run_func_sched_safe(generate_get_size_message()))
 

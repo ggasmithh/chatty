@@ -29,14 +29,12 @@ def load_model() -> markovify.Text:
 def setup_schedule() -> None:
     schedule.every(5).minutes.do(save_model)
 
-def run_func_sched_safe(func) -> None:
+def generate_get_size_message() -> str:
     schedule.run_all()
     schedule.clear()
-    func()
+    output = f"The current size of the model is {path.getsize(MODEL_NAME)}"
     setup_schedule()
-
-def generate_get_size_message() -> str:
-    return f"The current size of the model is {path.getsize(MODEL_NAME)}"
+    return output
 
 def check_chat(update: Update) -> bool:
     return str(update.message.chat_id) == str(CHATTY_CHAT_ID)
@@ -77,7 +75,7 @@ def train_and_reply(update: Update, context: CallbackContext) -> None:
 def get_size(update: Update, context: CallbackContext) -> None:
     if check_chat(update):
         context.bot.send_chat_action(chat_id = update.effective_message.chat_id, action = ChatAction.TYPING)
-        update.message.reply_text(run_func_sched_safe(generate_get_size_message()))
+        update.message.reply_text(generate_get_size_message())
 
 if __name__ == "__main__":
     try:

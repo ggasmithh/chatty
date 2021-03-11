@@ -13,8 +13,10 @@ CHATTY_CHAT_ID = environ['CHATTY_CHAT_ID']
 MODEL_NAME = "text_model.json"
 
 # If anyone tries to circumvent these limits I'm moving it to an environment var
-MESSAGE_LENGTH_LIMIT = 1000
-SAME_USER_LIMIT = 5
+# This the maximum length of a telegram message. If someone sends more than one
+# max length messages at a time, the bot will reject the input. This is to 
+# circumvent attempts to poison the bot with things like movie scripts.
+SAME_USER_CHAR_LIMIT = 4096
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                      level=logging.INFO)
@@ -47,13 +49,13 @@ def check_chat_id(update: Update) -> bool:
 
 def is_spam(update: Update) -> bool:
     if update.message.from_user == messages_from_same_user['last_user']:
-        messages_from_same_user['count'] += 1
-        if messages_from_same_user['count'] > SAME_USER_LIMIT or len(update.message.text) > MESSAGE_LENGTH_LIMIT:
+        messages_from_same_user['character_count'] += len(update.message.text)
+        if messages_from_same_user['character_count'] > SAME_USER_CHAR_LIMIT:
             return True
     
     else:
         messages_from_same_user['last_user'] = update.message.from_user
-        messages_from_same_user['last_user'] = 0
+        messages_from_same_user['character_count'] = 0
         return False
 
 def train(message: str) -> None:
@@ -100,7 +102,7 @@ def get_size(update: Update, context: CallbackContext) -> None:
 ##############
 # MAIN PROGRAM
 ##############
-messages_from_same_user = {'last_user': None, 'count': 0}
+messages_from_same_user = {'last_user': None, 'character_count': 0}
 
 try:
     text_model = load_model()

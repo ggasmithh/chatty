@@ -88,8 +88,9 @@ def train_and_reply(update: Update, context: CallbackContext) -> None:
                 new_sentence = text_model.make_sentence(tries=100)
                 if new_sentence:
                     full_message += f"{new_sentence} "
-
-            update.message.reply_text(full_message)
+            
+            if full_message:
+                update.message.reply_text(full_message)
 
 def get_size(update: Update, context: CallbackContext) -> None:
     if check_chat_id(update):

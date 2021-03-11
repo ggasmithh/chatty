@@ -47,10 +47,21 @@ def generate_get_size_message() -> str:
 def check_chat_id(update: Update) -> bool:
     return str(update.message.chat_id) == str(CHATTY_CHAT_ID)
 
+# TODO: add type hinting
+def unban_user(user):
+    banned_users.remove(user)
+    return schedule.CancelJob
+
 def is_spam(update: Update) -> bool:
+    if update.message.from_user in banned_users:
+        return True
+
     if update.message.from_user == messages_from_same_user['last_user']:
         messages_from_same_user['character_count'] += len(update.message.text)
+
         if messages_from_same_user['character_count'] > SAME_USER_CHAR_LIMIT:
+            banned_users.append(messages_from_same_user['last_user'])
+            schedule.every(randrange(30, 60)).minutes.do(unban_user, user=messages_from_same_user['last_user'])
             return True
     
     else:
@@ -103,6 +114,7 @@ def get_size(update: Update, context: CallbackContext) -> None:
 # MAIN PROGRAM
 ##############
 messages_from_same_user = {'last_user': None, 'character_count': 0}
+banned_users = []
 
 try:
     text_model = load_model()

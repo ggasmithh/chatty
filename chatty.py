@@ -93,7 +93,7 @@ def train_and_reply(update: Update, context: CallbackContext) -> None:
     if check_chat_id(update) and not is_spam(update):
         train(update.message.text)
 
-        if randrange(0, 100) < 5:
+        if randrange(0, 100) < 5 or update.message.reply_to_message.from_user.id == context.bot.get_me().id:
             context.bot.send_chat_action(chat_id = update.effective_message.chat_id, action = ChatAction.TYPING)
             full_message = ""
                               

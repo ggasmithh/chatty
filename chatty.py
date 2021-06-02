@@ -6,6 +6,7 @@ import schedule
 from os import environ, path
 from random import randrange
 import atexit
+import humanfriendly
 
 CHATTY_BOT_TOKEN = environ['CHATTY_BOT_TOKEN']
 CHATTY_CHAT_ID = environ['CHATTY_CHAT_ID']
@@ -40,7 +41,7 @@ def setup_schedule() -> None:
 def generate_get_size_message() -> str:
     schedule.run_all()
     schedule.clear()
-    output = f"The current size of the model is {path.getsize(MODEL_NAME)} bytes!"
+    output = f"The current size of the model is {humanfriendly.format_size(path.getsize(MODEL_NAME), binary=True)}!"
     setup_schedule()
     return output
 

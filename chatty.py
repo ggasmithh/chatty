@@ -99,11 +99,11 @@ def train_and_reply(update: Update, context: CallbackContext) -> None:
         if update.message.reply_to_message != None:
             direct_reply = update.message.reply_to_message.from_user.id == context.bot.get_me().id
 
-        if randrange(0, 100) < 5 or direct_reply:
+        if randrange(0, 100) < 2 or direct_reply:
             context.bot.send_chat_action(chat_id = update.effective_message.chat_id, action = ChatAction.TYPING)
             full_message = ""
                               
-            for i in range(randrange(1, 5)):
+            for i in range(randrange(1, 3)):
                 new_sentence = text_model.make_sentence(tries=100)
                 if new_sentence:
                     full_message += f"{new_sentence} "
